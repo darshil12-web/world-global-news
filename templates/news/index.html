@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Latest News | WorldGlobal{% endblock %}
+
+{% block content %}
+<section class="news-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>{% if current_category %}{{ current_category }} News{% else %}Latest News{% endif %}</h2>
+        </div>
+
+        <div class="news-grid">
+            {% for item in news_items %}
+            <article class="news-card">
+                <div class="card-image">
+                    <img src="{{ item.image }}" alt="{{ item.title }}">
+                </div>
+                <div class="card-meta">
+                    <span class="category">{{ item.category|default:"World News" }}</span>
+                    <span class="date">{{ item.date|slice:":10"|date:"d M Y"|default:item.date|slice:":10" }}</span>
+                </div>
+                <h3 class="card-title">
+                    <a href="{% url 'news_detail' item.slug %}">{{ item.title }}</a>
+                </h3>
+                <p class="card-summary">{{ item.summary }}</p>
+            </article>
+            {% empty %}
+            <div class="no-news">
+                <p>No news articles found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

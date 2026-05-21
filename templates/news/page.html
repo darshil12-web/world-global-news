@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} | WorldGlobal{% endblock %}
+{% block meta_description %}{{ content|truncatewords:20 }}{% endblock %}
+
+{% block content %}
+<article class="article-detail">
+    <div class="container article-container">
+        <header class="article-header" style="padding-top: 60px; padding-bottom: 20px;">
+            <h1 class="article-title">{{ title }}</h1>
+        </header>
+
+        <div class="article-body">
+            <p>{{ content|safe }}</p>
+        </div>
+    </div>
+</article>
+{% endblock %}

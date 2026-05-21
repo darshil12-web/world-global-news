@@ -1,0 +1,113 @@
+/* Add to the end of styles.css */
+.legal-page-header {
+    background: var(--bg-primary);
+    padding: 100px 0 40px;
+    text-align: center;
+}
+
+.legal-page-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.legal-page-subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-top: 12px;
+}
+
+.legal-container {
+    max-width: 900px;
+    margin: 0 auto 80px;
+    background: var(--bg-primary);
+    padding: 40px 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.legal-content h2 {
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin: 40px 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.legal-content h2:first-child {
+    margin-top: 0;
+}
+
+.legal-content h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+}
+
+.legal-content p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 24px;
+}
+
+.legal-content ul, .legal-content ol {
+    margin: 0 0 24px 24px;
+    color: var(--text-secondary);
+}
+
+.legal-content ul {
+    list-style-type: disc;
+}
+
+.legal-content ol {
+    list-style-type: decimal;
+}
+
+.legal-content li {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.legal-content a {
+    color: var(--accent-primary);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.legal-content a:hover {
+    color: var(--accent-hover);
+    text-decoration: none;
+}
+
+.legal-contact-box {
+    background: var(--bg-tertiary);
+    padding: 30px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin: 30px 0;
+}
+
+.legal-contact-box p {
+    margin-bottom: 12px;
+}
+
+.legal-contact-box p:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .legal-container {
+        margin: 0 auto 40px;
+        padding: 20px 15px;
+    }
+    
+    .legal-page-header {
+        padding: 80px 0 40px;
+    }
+    
+    .legal-page-title {
+        font-size: 2.2rem;
+    }
+}
