@@ -1,0 +1,45 @@
+<aside class="sidebar-wrapper">
+    <div class="sidebar-widget">
+        <h3 class="widget-title">Popular Posts</h3>
+        <div class="popular-posts">
+            {% if news_items %}
+            {% for item in news_items|slice:":4" %}
+            <div class="popular-post-item">
+                <a href="{% url 'news_detail' item.slug %}" class="popular-thumb">
+                    <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy">
+                </a>
+                <div class="popular-content">
+                    <span class="category">{{ item.category }}</span>
+                    <h4><a href="{% url 'news_detail' item.slug %}">{{ item.title }}</a></h4>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No popular posts available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+    <div class="sidebar-widget">
+        <h3 class="widget-title">Categories</h3>
+        <ul class="category-list">
+            <li><a href="{% url 'category_news' 'Android' %}">Android <span class="count">(12)</span></a></li>
+            <li><a href="{% url 'category_news' 'iOS' %}">iOS <span class="count">(8)</span></a></li>
+            <li><a href="{% url 'category_news' 'Windows' %}">Windows <span class="count">(15)</span></a></li>
+            <li><a href="{% url 'category_news' 'How-To' %}">How-To <span class="count">(20)</span></a></li>
+            <li><a href="{% url 'category_news' 'Apps' %}">Apps <span class="count">(14)</span></a></li>
+            <li><a href="{% url 'category_news' 'Gaming' %}">Gaming <span class="count">(19)</span></a></li>
+        </ul>
+    </div>
+
+    <div class="sidebar-widget newsletter-widget">
+        <h3 class="widget-title">Newsletter</h3>
+        <p>Subscribe to our newsletter to get the latest tech news delivered directly to your inbox.</p>
+        <form class="newsletter-form">
+            <input type="email" placeholder="Your email address" required>
+            <button type="submit" class="btn btn-primary w-100">Subscribe</button>
+        </form>
+    </div>
+</aside>

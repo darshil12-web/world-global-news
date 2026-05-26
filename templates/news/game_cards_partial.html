@@ -1,0 +1,8 @@
+{% for game in games %}
+<a href="{% url 'play_game' game.id %}" class="game-card" title="{{ game.title }}">
+    <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" loading="lazy">
+    <div class="game-overlay">
+        <h3>{{ game.title }}</h3>
+    </div>
+</a>
+{% endfor %}

@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ article.title }} | WorldGlobal{% endblock %}
+{% block title %}{{ article.title }} | TechWorld{% endblock %}
 {% block meta_description %}{{ article.summary }}{% endblock %}
 
 {% block content %}
-<article class="article-detail">
-    <div class="container article-container">
+<div class="container main-layout">
+    <div class="content-area">
+        <article class="article-detail">
         <header class="article-header">
             <div class="article-meta-top">
                 <span class="category">{{ article.category }}</span>
@@ -31,7 +32,7 @@
                     </div>
                     <div class="author-details">
                         <span class="author-name">By <strong>{{ article.author }}</strong></span>
-                        <span class="author-role">Senior Editor, WorldGlobal</span>
+                        <span class="author-role">Senior Editor, TechWorld</span>
                     </div>
                 </div>
 
@@ -45,75 +46,40 @@
             </div>
         </header>
 
-        <figure class="article-featured-image">
-            <img src="{{ article.image }}" alt="{{ article.title }}">
-        </figure>
+
+
 
         <div class="article-content-wrapper">
             <div class="article-body">
                 {{ article.content|safe }}
-
-                <!-- We simulate the requirement for 3 images and 1500+ words here -->
-
-                <h2>Expanding on the Details</h2>
-                <p>This is where the expanded, 1500-word human-written content will flow. Providing deep insights,
-                    multiple perspectives, and thorough analysis on the topic. Quality journalism requires space to
-                    explore the nuances of global events.</p>
-
-                <figure class="article-inline-image">
-                    <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=800&q=80"
-                        alt="News Context">
-                    <figcaption>Supplementary context image providing further visual detail.</figcaption>
-                </figure>
-
-                <p>With experts from India, the US, and the UK weighing in, the global consensus highlights the critical
-                    nature of these developments. The economic, political, and social ramifications are expected to
-                    ripple through international markets for the coming decade.</p>
-
-                <h2>Global Perspectives</h2>
-                <p>According to leading analysts in Mumbai and New York, the structural shifts we are witnessing are
-                    unprecedented. The integration of new policies will demand a collaborative effort across all major
-                    continents.</p>
-
-                <figure class="article-inline-image">
-                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80"
-                        alt="Analysis">
-                    <figcaption>Analysts reviewing the latest data trends.</figcaption>
-                </figure>
-
-                <p>As we continue to monitor the situation, one thing remains clear: adaptability is the key to
-                    navigating the future. Stay tuned to WorldGlobal for continuous, highly detailed updates on this
-                    developing story.</p>
             </div>
         </div>
 
-        <div class="article-comments">
-            <div class="comments-header">
-                <h3>Comments (<span id="total-comments">0</span>)</h3>
-                <div class="comments-sort">Sort by: <strong>Top</strong></div>
-            </div>
 
-            <div class="comment-input-area">
-                <img src="https://ui-avatars.com/api/?name=User&background=E2E8F0" alt="User" class="comment-avatar">
-                <div class="comment-input-box">
-                    <input type="text" id="comment-name" placeholder="Your Name (Optional)"
-                        style="width: 100%; padding: 12px 15px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; font-size: 1rem;">
-                    <textarea id="comment-input" placeholder="Add a public comment..."></textarea>
-                    <div class="comment-actions">
-                        <button id="post-comment-btn" class="btn btn-primary" type="button"
-                            style="padding: 10px 20px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s ease;">Post
-                            Comment</button>
-                    </div>
+
+        <!-- Related Posts Section -->
+        <div class="related-posts-section">
+            <h3>Related Articles</h3>
+            <div class="related-posts-grid">
+                {% for related in related_articles %}
+                <div class="related-post-card">
+                    <a href="{% url 'news_detail' related.slug %}">
+                        <img src="{{ related.image|default:'/static/img/default-share.jpg' }}" alt="{{ related.title }}">
+                        <h4>{{ related.title }}</h4>
+                    </a>
                 </div>
-            </div>
-
-            <!-- Only real user comments will appear here -->
-            <div class="comment-list">
+                {% empty %}
+                <p>No related articles found.</p>
+                {% endfor %}
             </div>
         </div>
 
+        </article>
     </div>
-</article>
+    
+    <!-- Sidebar Component -->
+    {% include 'news/sidebar.html' %}
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -176,7 +142,7 @@
                         commentList.appendChild(renderComment(comment));
                     });
                     if (commentCountEl) commentCountEl.innerText = comments.length;
-                    
+
                     document.querySelectorAll('.comment-engagement').forEach(el => {
                         let cid = el.getAttribute('data-id');
                         if (localStorage.getItem('user_liked_comment_' + articleSlug + '_' + cid) === 'true') {
@@ -199,14 +165,14 @@
         commentList.addEventListener('click', function (e) {
             if (e.target.classList.contains('like-btn')) {
                 if (e.target.classList.contains('user-liked')) return;
-                
+
                 let engagementDiv = e.target.closest('.comment-engagement');
                 let cid = engagementDiv.getAttribute('data-id');
                 let currentLikes = parseInt(engagementDiv.getAttribute('data-likes')) || 0;
                 currentLikes++;
                 engagementDiv.setAttribute('data-likes', currentLikes);
                 e.target.innerText = `👍 ${formatNumber(currentLikes)}`;
-                
+
                 e.target.classList.add('user-liked');
                 e.target.style.color = '#3b82f6';
                 localStorage.setItem('user_liked_comment_' + articleSlug + '_' + cid, 'true');
@@ -214,14 +180,14 @@
 
             if (e.target.classList.contains('dislike-btn')) {
                 if (e.target.classList.contains('user-disliked')) return;
-                
+
                 let engagementDiv = e.target.closest('.comment-engagement');
                 let cid = engagementDiv.getAttribute('data-id');
                 let currentDislikes = parseInt(engagementDiv.getAttribute('data-dislikes')) || 0;
                 currentDislikes++;
                 engagementDiv.setAttribute('data-dislikes', currentDislikes);
                 e.target.innerText = `👎 ${formatNumber(currentDislikes)}`;
-                
+
                 e.target.classList.add('user-disliked');
                 e.target.style.color = '#ef4444';
                 localStorage.setItem('user_disliked_comment_' + articleSlug + '_' + cid, 'true');
@@ -248,21 +214,21 @@
                         },
                         body: JSON.stringify({ name: name, text: text })
                     })
-                    .then(res => res.json())
-                    .then(data => {
-                        commentBtn.innerText = originalText;
-                        commentBtn.disabled = false;
-                        if (data.comment) {
-                            commentInput.value = '';
-                            if (nameInput) nameInput.value = '';
-                            fetchComments();
-                        }
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        commentBtn.innerText = originalText;
-                        commentBtn.disabled = false;
-                    });
+                        .then(res => res.json())
+                        .then(data => {
+                            commentBtn.innerText = originalText;
+                            commentBtn.disabled = false;
+                            if (data.comment) {
+                                commentInput.value = '';
+                                if (nameInput) nameInput.value = '';
+                                fetchComments();
+                            }
+                        })
+                        .catch(e => {
+                            console.error(e);
+                            commentBtn.innerText = originalText;
+                            commentBtn.disabled = false;
+                        });
                 }
             });
         }

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Play {{ game.title }} | TechWorld{% endblock %}
+
+{% block content %}
+<div class="container main-layout" style="grid-template-columns: 1fr;">
+    <div class="content-area">
+        
+        <div class="play-container" style="background: var(--bg-secondary); border-radius: 12px; overflow: hidden; margin-top: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            
+            <!-- TechWorld Logo & Title Header -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; background: #1a1a2e; color: #fff;">
+                <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700;">{{ game.title }}</h1>
+                <a href="{% url 'index' %}" class="logo" style="color: #fff; text-decoration: none;">
+                    TECH<span style="color: var(--accent-primary);">World</span>
+                </a>
+            </div>
+
+            <!-- Game Frame -->
+            <div class="iframe-container" style="width: 100%; height: 80vh; background: #000;">
+                <iframe src="{{ game.iframe_url }}" frameborder="0" allowfullscreen allow="autoplay; fullscreen *" style="width: 100%; height: 100%;"></iframe>
+            </div>
+
+            <div style="padding: 20px 25px;">
+                <p style="color: var(--text-secondary); margin: 0; font-size: 1.05rem;">{{ game.description|default:"Play "|add:game.title|add:" online for free on TechWorld!" }}</p>
+            </div>
+        </div>
+
+        <!-- Related Games -->
+        <section class="games-section" style="margin-top: 40px; padding-top: 40px; border-top: 1px dashed var(--border-color);">
+            <h2 class="section-title" style="margin-bottom: 24px;">More Games Like This</h2>
+            
+            <div class="games-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+                {% for related in related_games %}
+                <a href="{% url 'play_game' related.id %}" class="game-card" title="{{ related.title }}">
+                    <img src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">
+                    <div class="game-overlay">
+                        <h3>{{ related.title }}</h3>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<style>
+    /* ── Game Grid (Reused for Related Games) ── */
+    .game-card {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        aspect-ratio: 1 / 1;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: block;
+    }
+
+    .game-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .game-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+        z-index: 5;
+    }
+
+    .game-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .game-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+        padding: 30px 10px 10px;
+        opacity: 0;
+        transition: opacity 0.22s ease;
+    }
+
+    .game-overlay h3 {
+        color: #fff;
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .game-card:hover .game-overlay {
+        opacity: 1;
+    }
+</style>
+{% endblock %}

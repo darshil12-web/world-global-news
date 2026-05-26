@@ -1,0 +1,32 @@
+# --- Virtual Environment ---
+venv/
+ENV/
+env/
+.venv/
+
+# --- Databases ---
+db.sqlite3
+*.db
+*.sqlite3
+
+# --- Django/Python Specific ---
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+celerybeat-schedule
+.env
+.venv
++secret_settings.py
+
+# --- Media and Uploads ---
+media/
+
+# --- OS & IDE Specific ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

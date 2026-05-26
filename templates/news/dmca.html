@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}DMCA Policy | TechWorld{% endblock %}
+{% block content %}
+<div class="legal-page-header">
+    <div class="container">
+        <h1 class="legal-page-title">DMCA Policy</h1>
+        <p class="legal-page-subtitle">Information regarding the Digital Millennium Copyright Act.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="legal-container">
+        <div class="legal-content">
+            <p>At TechWorld, we respect the intellectual property rights of others and expect our users to do the same. In accordance with the Digital Millennium Copyright Act of 1998, we will respond expeditiously to claims of copyright infringement committed using the TechWorld service that are reported to our Designated Copyright Agent.</p>
+            
+            <h2>Reporting Claims of Copyright Infringement</h2>
+            <p>If you are a copyright owner, authorized to act on behalf of one, or authorized to act under any exclusive right under copyright, please report alleged copyright infringements taking place on or through the Site by completing the following DMCA Notice of Alleged Infringement and delivering it to our Designated Copyright Agent.</p>
+
+            <h2>DMCA Notice of Alleged Infringement</h2>
+            <ol>
+                <li>Identify the copyrighted work that you claim has been infringed.</li>
+                <li>Identify the material or link you claim is infringing (or the subject of infringing activity) and that access to which is to be disabled.</li>
+                <li>Provide your mailing address, telephone number, and email address.</li>
+                <li>Include both of the following statements in the body of the Notice:<br>
+                    "I hereby state that I have a good faith belief that the disputed use of the copyrighted material is not authorized by the copyright owner, its agent, or the law."<br>
+                    "I hereby state that the information in this Notice is accurate and, under penalty of perjury, that I am the owner, or authorized to act on behalf of the owner, of the copyright or of an exclusive right under the copyright that is allegedly infringed."
+                </li>
+                <li>Provide your full legal name and your electronic or physical signature.</li>
+            </ol>
+            <p>If you would like to submit a notice, please <a href="{% url 'contact' %}">contact us</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

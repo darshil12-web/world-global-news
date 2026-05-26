@@ -5,20 +5,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}WorldGlobal | Live Scores, News & Updates{% endblock %}</title>
+    <title>{% block title %}TechWorld | Live Scores, News & Updates{% endblock %}</title>
     <meta name="description"
-        content="{% block meta_description %}WorldGlobal is a premier platform delivering the fastest live scores, breaking news, and updates.{% endblock %}">
+        content="{% block meta_description %}TechWorld is a premier platform delivering the fastest live scores, breaking news, and updates.{% endblock %}">
+
+    <!-- SEO Meta Tags -->
+    <meta name="keywords" content="news, breaking news, tech news, technology, business, live scores, daily updates">
+    <meta name="author" content="TechWorld">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}TechWorld | Live Scores, News & Updates{% endblock %}">
+    <meta property="og:description"
+        content="{% block og_description %}TechWorld is a premier platform delivering the fastest live scores, breaking news, and updates.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'img/default-share.jpg' %}{% endblock %}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta property="twitter:title"
+        content="{% block twitter_title %}TechWorld | Live Scores, News & Updates{% endblock %}">
+    <meta property="twitter:description"
+        content="{% block twitter_description %}TechWorld is a premier platform delivering the fastest live scores, breaking news, and updates.{% endblock %}">
+    <meta property="twitter:image"
+        content="{% block twitter_image %}{% static 'img/default-share.jpg' %}{% endblock %}">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Bebas+Neue&family=Pacifico&display=swap"
         rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/legal_styles.css' %}">
+    
+    <!-- Strict Dark Mode Init to Prevent Flash -->
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 </head>
 
 <body>
@@ -26,27 +58,38 @@
         <div class="container header-container">
             <div class="header-left">
                 <a href="{% url 'index' %}" class="logo">
-                    World<span>Global</span>
+                    TECH<span>World</span>
                 </a>
-                <span class="header-divider">|</span>
-                <span class="header-date">{% now "l, j F Y" %}</span>
             </div>
 
             <div class="header-right">
                 <nav class="main-nav">
                     <ul>
-                        <li><a href="{% url 'category_news' 'World' %}" class="nav-link">World</a></li>
-                        <li><a href="{% url 'category_news' 'Technology' %}" class="nav-link">Technology</a></li>
-                        <li><a href="{% url 'category_news' 'Business' %}" class="nav-link">Business</a></li>
-                        <li><a href="{% url 'category_news' 'News' %}" class="nav-link">News</a></li>
-                        <li><a href="{% url 'category_news' 'Lifestyle' %}" class="nav-link">Lifestyle</a></li>
+                        <li><a href="{% url 'category_news' 'Android' %}" class="nav-link">Android</a></li>
+                        <li><a href="{% url 'category_news' 'iOS' %}" class="nav-link">iOS</a></li>
+                        <li><a href="{% url 'category_news' 'Windows' %}" class="nav-link">Windows</a></li>
+                        <li><a href="{% url 'category_news' 'How-To' %}" class="nav-link">How-To</a></li>
+                        <li><a href="{% url 'category_news' 'Apps' %}" class="nav-link">Apps</a></li>
+                        <li><a href="{% url 'category_news' 'Gaming' %}" class="nav-link">Gaming</a></li>
+                        <li><a href="{% url 'games' %}" class="nav-link" style="color: var(--accent-primary); font-weight: 700;">🎮 Play Games</a></li>
                     </ul>
                 </nav>
+                <div class="header-search">
+                    <form action="{% url 'index' %}" method="get" class="search-form">
+                        <input type="text" name="q" placeholder="Search..." aria-label="Search">
+                        <button type="submit" aria-label="Submit Search">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </button>
+                    </form>
+                </div>
                 <button class="theme-toggle" aria-label="Toggle Theme">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
+                </button>
+                <button class="mobile-menu-toggle" aria-label="Toggle Mobile Menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
             </div>
         </div>
@@ -61,73 +104,99 @@
         <div class="container footer-container">
             <div class="footer-col footer-brand">
                 <a href="{% url 'index' %}" class="logo">
-                    World<span>Global</span>
+                    TECH<span>World</span>
                 </a>
-                <p>WorldGlobal is a premier platform delivering the fastest live scores, breaking news, and real-time
-                    updates.</p>
+                <p style="color: var(--text-primary); font-size: 1rem; margin-top: 5px; margin-bottom: 20px;">Tech Made Simple</p>
+                <div class="social-links-text">
+                    <a href="#" aria-label="Facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                        Facebook
+                    </a>
+                    <a href="#" aria-label="LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                            <rect x="2" y="9" width="4" height="12"></rect>
+                            <circle cx="4" cy="4" r="2"></circle>
+                        </svg>
+                        Linkedin
+                    </a>
+                </div>
             </div>
 
             <div class="footer-col">
-                <h4>About</h4>
+                <h4>Company</h4>
                 <ul>
                     <li><a href="{% url 'about' %}">About Us</a></li>
                     <li><a href="{% url 'contact' %}">Contact Us</a></li>
-                    <li><a href="{% url 'disclaimer' %}">Disclaimer</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h4>Policies</h4>
-                <ul>
+                    <li><a href="{% url 'editorial_policy' %}">Editorial Policy</a></li>
                     <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
-                    <li><a href="{% url 'terms' %}">Terms of Service</a></li>
-                    <li><a href="{% url 'cookie' %}">Cookie Policy</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>Connect</h4>
-                <div class="social-icons">
-                    <a href="#" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="X (Twitter)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
-                            <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="YouTube">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z">
-                            </path>
-                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-                        </svg>
-                    </a>
-                </div>
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="{% url 'category_news' 'Android' %}">Android</a></li>
+                    <li><a href="{% url 'category_news' 'iOS' %}">iOS</a></li>
+                    <li><a href="{% url 'category_news' 'Windows' %}">Windows</a></li>
+                    <li><a href="{% url 'category_news' 'How-To' %}">How-To</a></li>
+                    <li><a href="{% url 'category_news' 'Apps' %}">Apps</a></li>
+                    <li><a href="{% url 'category_news' 'Gaming' %}">Gaming</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="{% url 'dmca' %}">DMCA</a></li>
+                    <li><a href="{% url 'disclaimer' %}">Disclaimer</a></li>
+                    <li><a href="{% url 'terms' %}">Terms and Conditions</a></li>
+                </ul>
             </div>
         </div>
 
         <div class="footer-bottom">
             <div class="container">
-                <p>&copy; {% now "Y" %} WorldGlobal. All rights reserved.</p>
+                <p>Copyright &copy; TechWorld {% now "Y" %}</p>
             </div>
         </div>
     </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.querySelector('.theme-toggle');
+            
+            const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+            const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+
+            function updateIcon(theme) {
+                if(themeToggleBtn) {
+                    themeToggleBtn.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+                }
+            }
+
+            // Sync icon with current theme
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            updateIcon(currentTheme);
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    let theme = document.documentElement.getAttribute('data-theme');
+                    if (theme === 'dark') {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        updateIcon('light');
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        updateIcon('dark');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
