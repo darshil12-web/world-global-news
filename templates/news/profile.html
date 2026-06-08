@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile | GamePro Portal{% endblock %}
+
+{% block content %}
+<div class="welcome-card" style="margin-bottom: 24px;">
+    <div class="welcome-avatar-wrapper" id="profile-avatar-render" style="width: 100px; height: 100px; border-width: 4px;">
+        <!-- Rendered by JS -->
+    </div>
+    <div class="welcome-info">
+        <h2 class="welcome-title" style="font-size: 28px;">
+            <span id="profile-username-text">Guest</span>
+            <button class="edit-name-btn" onclick="openChangeUsernameModal()" title="Edit Username">
+                <i data-lucide="edit-3" style="width: 18px; height: 18px;"></i>
+            </button>
+        </h2>
+        <p class="welcome-subtitle" style="font-size: 15px;">Rank: <strong style="color: var(--color-blue);">Builder Developer</strong> &nbsp;|&nbsp; Member since: <strong style="color: var(--text-color);">Today</strong></p>
+    </div>
+    <div class="welcome-stats">
+        <div class="welcome-stat-box" style="padding: 12px 24px;">
+            <div class="welcome-stat-num" id="profile-robux-amount" style="font-size: 20px;">100</div>
+            <div class="welcome-stat-label" style="font-size: 12px;">Robux</div>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.8fr 1fr; gap: 24px; margin-bottom: 32px;">
+    <!-- Biography / Custom Bio Editor -->
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+        <h3 style="margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+            About Me
+            <button class="edit-name-btn" id="bio-edit-toggle-btn" onclick="toggleBioEdit()" style="font-size: 13px; font-weight: 600; gap: 4px; padding: 6px 12px; background-color: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 6px;">
+                <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit Bio
+            </button>
+        </h3>
+        
+        <!-- View Bio -->
+        <p id="bio-view-text" style="white-space: pre-line; line-height: 1.6; color: var(--text-muted);">This user has not written a biography yet. Click the Edit button above to tell other players about yourself!</p>
+        
+        <!-- Edit Bio Form -->
+        <div id="bio-edit-container" style="display: none; flex-direction: column; gap: 12px;">
+            <textarea id="bio-edit-input" rows="4" class="modal-input" style="width: 100%; font-family: var(--font-family); background-color: var(--bg-sidebar); color: var(--text-color); border-color: var(--border-color); padding: 12px; resize: vertical;" placeholder="Tell people about yourself..."></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button class="modal-btn cancel" onclick="toggleBioEdit()" style="padding: 6px 12px;">Cancel</button>
+                <button class="modal-btn save" onclick="saveBio()" style="padding: 6px 12px; background-color: var(--color-green);">Save Biography</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory quick stats / info -->
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); align-self: flex-start;">
+        <h3 style="margin-top: 0; margin-bottom: 16px;">Statistics</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                <span style="color: var(--text-sub);">Inventory Count</span>
+                <span style="font-weight: 700;" id="profile-inv-count">3 items</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                <span style="color: var(--text-sub);">Game Creations</span>
+                <span style="font-weight: 700;">Active Builder</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
+                <span style="color: var(--text-sub);">Account Badge</span>
+                <span style="font-weight: 700; color: var(--color-green); display: flex; align-items: center; gap: 4px;">
+                    <i data-lucide="award" style="width: 14px; height: 14px;"></i> Verified
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Inventory showcase -->
+<div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); margin-bottom: 32px;">
+    <h3 style="margin-top: 0; margin-bottom: 16px;">My Catalog Items</h3>
+    <div class="roblox-games-grid" id="profile-owned-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
+        <!-- Loaded dynamically via JS -->
+    </div>
+</div>
+
+<script>
+    // Bio toggling
+    let isEditingBio = false;
+    
+    window.toggleBioEdit = function() {
+        const viewText = document.getElementById('bio-view-text');
+        const editContainer = document.getElementById('bio-edit-container');
+        const editInput = document.getElementById('bio-edit-input');
+        const toggleBtn = document.getElementById('bio-edit-toggle-btn');
+        
+        isEditingBio = !isEditingBio;
+        if (isEditingBio) {
+            viewText.style.display = 'none';
+            editContainer.style.display = 'flex';
+            editInput.value = localStorage.getItem('roblox_bio') || '';
+            editInput.focus();
+            toggleBtn.innerHTML = `<i data-lucide="x" style="width: 14px; height: 14px;"></i> Close`;
+        } else {
+            viewText.style.display = 'block';
+            editContainer.style.display = 'none';
+            toggleBtn.innerHTML = `<i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit Bio`;
+        }
+        lucide.createIcons();
+    };
+    
+    window.saveBio = function() {
+        const editInput = document.getElementById('bio-edit-input');
+        const bioText = editInput.value.trim();
+        
+        localStorage.setItem('roblox_bio', bioText);
+        
+        const viewText = document.getElementById('bio-view-text');
+        viewText.innerText = bioText || "This user has not written a biography yet. Click the Edit button above to tell other players about yourself!";
+        
+        toggleBioEdit();
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Sync profile text
+        document.getElementById('profile-username-text').innerText = robloxUsername;
+        document.getElementById('profile-robux-amount').innerText = robloxRobux;
+        document.getElementById('profile-avatar-render').innerHTML = getAvatarSVG(robloxEquippedHat, robloxEquippedShirt, robloxEquippedFace, 0.95);
+        
+        // Restore Bio
+        const bioText = localStorage.getItem('roblox_bio');
+        if (bioText) {
+            document.getElementById('bio-view-text').innerText = bioText;
+        }
+        
+        // Inventory parsing
+        const catalogDetails = {
+            bacon_hair: { name: 'Bacon Hair', type: 'Hat' },
+            red_cap: { name: 'Roblox Red Cap', type: 'Hat' },
+            wizard_hat: { name: 'Wizard Hat', type: 'Hat' },
+            crown: { name: 'Royal Crown', type: 'Hat' },
+            valkyrie: { name: 'Valkyrie Helm', type: 'Hat' },
+            roblox_hoodie: { name: 'Blue Hoodie', type: 'Shirt' },
+            tuxedo: { name: 'Elegant Tuxedo', type: 'Shirt' },
+            gold_tee: { name: 'Gold Chain Tee', type: 'Shirt' },
+            ninja_suit: { name: 'Ninja Gi', type: 'Shirt' },
+            smile_face: { name: 'Default Smile', type: 'Face' },
+            chill_face: { name: 'Chill Face', type: 'Face' },
+            winner_face: { name: 'Winner Smile', type: 'Face' },
+            beast_face: { name: 'Beast Mode', type: 'Face' },
+        };
+        
+        document.getElementById('profile-inv-count').innerText = `${robloxInventory.length} items`;
+        
+        const ownedGrid = document.getElementById('profile-owned-grid');
+        if (ownedGrid) {
+            let html = '';
+            robloxInventory.forEach(itemId => {
+                const item = catalogDetails[itemId] || { name: 'Accessory', type: 'Gear' };
+                // Render a mini card with item preview
+                let previewContent = '';
+                if (avatarPresets.hats[itemId]) previewContent = avatarPresets.hats[itemId];
+                else if (avatarPresets.shirts[itemId]) previewContent = avatarPresets.shirts[itemId];
+                else if (avatarPresets.faces[itemId]) previewContent = avatarPresets.faces[itemId];
+                
+                const isEquipped = (robloxEquippedHat === itemId || robloxEquippedShirt === itemId || robloxEquippedFace === itemId);
+                
+                html += `
+                <div class="avatar-item-card ${isEquipped ? 'equipped' : ''}" style="cursor: default; padding: 12px;">
+                    <div class="avatar-item-img" style="width: 72px; height: 72px;">
+                        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            ${previewContent}
+                        </div>
+                    </div>
+                    <div class="avatar-item-name" style="font-size: 13px; font-weight: 700; margin-top: 8px;">${item.name}</div>
+                    <div style="font-size: 10px; color: var(--text-sub); margin-top: 2px;">${item.type}</div>
+                    ${isEquipped ? '<span class="avatar-item-equipped-badge" style="font-size: 9px; padding: 2px 6px;">Equipped</span>' : ''}
+                </div>`;
+            });
+            ownedGrid.innerHTML = html;
+        }
+    });
+</script>
+{% endblock %}

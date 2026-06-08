@@ -1251,3 +1251,143 @@ ul {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
+
+/* ── Random Game Sidebar Widget ── */
+.random-game-widget {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    overflow: hidden;
+}
+
+.random-game-card-container {
+    position: relative;
+    width: 100%;
+}
+
+.random-game-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, opacity 0.4s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.random-game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.random-game-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #000;
+}
+
+.random-game-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.random-game-card:hover .random-game-img-wrapper img {
+    transform: scale(1.08);
+}
+
+.play-overlay-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width: 50px;
+    height: 50px;
+    background: rgba(2, 116, 190, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.play-overlay-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.random-game-card:hover .play-overlay-icon {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.random-game-info {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.random-game-info h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.4;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.random-game-badge {
+    align-self: flex-start;
+    background: var(--accent-primary);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color var(--transition-fast);
+}
+
+[data-theme="dark"] .random-game-badge {
+    color: #0F172A;
+}
+
+.random-game-card:hover .random-game-badge {
+    background: var(--accent-hover);
+}
+
+/* Rotate and Fade Animations for Carousel */
+.rotate-fade-out {
+    opacity: 0;
+    transform: scale(0.95) translateY(5px);
+}
+
+.rotate-fade-in {
+    animation: rotateIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes rotateIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

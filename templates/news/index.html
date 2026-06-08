@@ -1,271 +1,120 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if current_category %}{{ current_category }} News{% else %}Latest News{% endif %} | TechWorld{% endblock %}
-{% block meta_description %}Stay informed with the latest breaking news, world events, technology, and business updates
-on TechWorld.{% endblock %}
+{% block title %}
+{% if current_category %}{% if "games" in current_category|lower %}{{ current_category }}{% else %}{{ current_category }} Games{% endif %}{% elif query %}Search Results for "{{ query }}"{% else %}Home{% endif %} | Pokgame
+{% endblock %}
 
 {% block content %}
-
-
-
-
-<!-- ── Main Layout with Sidebar ── -->
-<div class="container main-layout">
-    <div class="content-area">
-        {% if not current_category %}
-        <!-- Featured Posts Slider/Grid -->
-        <section class="featured-section">
-            <h2 class="section-title">Featured Posts</h2>
-            {% if news_items %}
-            <div class="featured-grid">
-                {% for item in news_items|slice:":2" %}
-                <article class="featured-card">
-                    <a href="{% url 'news_detail' item.slug %}">
-                        <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy">
-                        <div class="featured-overlay">
-                            <span class="category">{{ item.category }}</span>
-                            <h3>{{ item.title }}</h3>
-                        </div>
-                    </a>
-                </article>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </section>
+<!-- Grid Explorer for Poki-Style Home/Category/Search -->
+{% if not is_home %}
+<div class="category-header" style="border-bottom: none; justify-content: center;">
+    <h2 class="category-title-main" style="text-align: center; width: 100%;">
+        {% if current_category %}
+            {% if "games" in current_category|lower %}{{ current_category }}{% else %}{{ current_category }} Games{% endif %}
+        {% elif query %}
+            Search Results for "{{ query }}"
         {% endif %}
+    </h2>
+</div>
+{% endif %}
 
-        <!-- Latest Articles / Category News -->
-        <section class="news-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    {% if current_category %}
-                    {{ current_category }}
-                    {% else %}
-                    Latest Articles
-                    {% endif %}
-                </h2>
-                {% if current_category %}
-                <a href="{% url 'index' %}" class="back-home-link">← All News</a>
-                {% endif %}
-            </div>
-
-            {% if news_items %}
-            <div class="news-list">
-                {% for item in news_items|slice:"2:" %}
-                <article class="list-card">
-                    <a href="{% url 'news_detail' item.slug %}" class="list-image">
-                        <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy">
-                    </a>
-                    <div class="list-content">
-                        <div class="card-meta">
-                            <span class="category">{{ item.category }}</span>
-                            <span class="date">{{ item.date }}</span>
-                        </div>
-                        <h3 class="card-title">
-                            <a href="{% url 'news_detail' item.slug %}">{{ item.title }}</a>
-                        </h3>
-                        <p class="card-summary">{{ item.summary }}</p>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-news-msg">
-                <p>No news articles found{% if current_category %} in <strong>{{ current_category }}</strong>{% endif %}.
-                    Check back soon!</p>
-            </div>
-            {% endif %}
-        </section>
-    </div>
-
-    <!-- Sidebar Component -->
-    {% include 'news/sidebar.html' %}
+{% if not games %}
+<div style="text-align: center; padding: 48px; background-color: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
+    <i data-lucide="search-code" style="width: 48px; height: 48px; color: var(--text-sub); margin-bottom: 16px;"></i>
+    <h3 style="margin: 0 0 8px 0;">No games found</h3>
+    <p style="margin: 0; color: var(--text-sub);">Try searching for another keyword or check back later.</p>
+</div>
+{% else %}
+<div class="roblox-games-grid" id="game-grid">
+    {% include 'news/game_cards_partial.html' %}
 </div>
 
-<style>
-    .main-layout {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 32px;
-        padding-top: 32px;
-    }
-    
-    @media (min-width: 992px) {
-        .main-layout {
-            grid-template-columns: 2fr 1fr;
+{% if has_next %}
+<div id="infinite-scroll-trigger" data-page="2" style="height: 50px;"></div>
+{% endif %}
+{% endif %}
+
+<script>
+    // Shelf smooth scrolling click triggers
+    window.scrollShelf = function (button, scrollVal) {
+        const container = button.parentNode.querySelector('.shelf-inner');
+        if (container) {
+            container.scrollBy({ left: scrollVal, behavior: 'smooth' });
         }
-    }
+    };
 
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        margin-bottom: 24px;
-        position: relative;
-        padding-bottom: 12px;
-    }
-    
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: var(--accent-primary);
-    }
-
-    /* Featured Grid */
-    .featured-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-        margin-bottom: 40px;
-    }
-    
-    @media (min-width: 768px) {
-        .featured-grid {
-            grid-template-columns: 1fr 1fr;
+    // Category sorting redirection
+    window.applySorting = function () {
+        const select = document.getElementById('sort-filter-select');
+        if (select) {
+            const val = select.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('order', val);
+            window.location.href = url.toString();
         }
-    }
-    
-    .featured-card {
-        position: relative;
-        border-radius: var(--radius-md);
-        overflow: hidden;
-        aspect-ratio: 16/9;
-    }
-    
-    .featured-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    
-    .featured-card:hover img {
-        transform: scale(1.05);
-    }
-    
-    .featured-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(0,0,0,0.8));
-        padding: 24px;
-        color: white;
-    }
-    
-    .featured-overlay .category {
-        background: var(--accent-primary);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        font-weight: 700;
-        margin-bottom: 8px;
-        display: inline-block;
-    }
-    
-    .featured-overlay h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.4;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
+    };
 
-    /* List Layout for Articles */
-    .news-list {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-    }
-    
-    .list-card {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    @media (min-width: 600px) {
-        .list-card {
-            flex-direction: row;
+    document.addEventListener('DOMContentLoaded', () => {
+        // Sync homepage welcome card values with LocalStorage
+        if (document.getElementById('welcome-username-text')) {
+            document.getElementById('welcome-username-text').innerText = robloxUsername;
         }
-        .list-image {
-            width: 250px;
-            flex-shrink: 0;
+        if (document.getElementById('welcome-robux-amount')) {
+            document.getElementById('welcome-robux-amount').innerText = robloxRobux;
         }
-    }
-    
-    .list-image {
-        display: block;
-        border-radius: var(--radius-sm);
-        overflow: hidden;
-        aspect-ratio: 16/9;
-    }
-    
-    .list-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    
-    .list-card:hover .list-image img {
-        transform: scale(1.05);
-    }
-    
-    .list-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+        const welcomeAvatar = document.getElementById('welcome-avatar-render');
+        if (welcomeAvatar) {
+            welcomeAvatar.innerHTML = getAvatarSVG(robloxEquippedHat, robloxEquippedShirt, robloxEquippedFace, 0.95);
+        }
 
-    .list-content h3 {
-        font-size: 1.35rem;
-        font-weight: 700;
-        margin: 10px 0 8px;
-        line-height: 1.4;
-    }
-    
-    .list-content h3 a {
-        color: var(--text-primary);
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    
-    .list-content h3 a:hover {
-        color: var(--accent-primary);
-    }
-    
-    .list-content .summary {
-        font-size: 0.95rem;
-        color: var(--text-secondary);
-        line-height: 1.6;
-        margin: 0;
-    }
+        // Infinite Scroll Grid Observer
+        const trigger = document.getElementById('infinite-scroll-trigger');
+        let isLoading = false;
 
-    .back-home-link {
-        font-size: 0.9rem;
-        color: var(--accent-primary);
-        font-weight: 600;
-    }
+        if (trigger) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !isLoading) {
+                    loadMoreGames();
+                }
+            }, { rootMargin: "400px" });
 
-    .back-home-link:hover {
-        text-decoration: underline;
-    }
+            observer.observe(trigger);
 
-    .no-news-msg {
-        text-align: center;
-        padding: 80px 0;
-        color: var(--text-secondary);
-        font-size: 1.05rem;
-    }
-</style>
+            function loadMoreGames() {
+                isLoading = true;
+                const page = trigger.getAttribute('data-page');
+                if (!page) return;
+
+                const order = new URLSearchParams(window.location.search).get('order') || '-views';
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', page);
+                url.searchParams.set('order', order);
+                url.searchParams.set('ajax', '1');
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('game-grid').insertAdjacentHTML('beforeend', data.html);
+
+                        // Re-render Lucide icons for new cards!
+                        lucide.createIcons();
+
+                        if (data.has_next) {
+                            trigger.setAttribute('data-page', data.next_page_number);
+                            isLoading = false;
+                        } else {
+                            observer.disconnect();
+                            trigger.remove();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error loading more games:', err);
+                        isLoading = false;
+                    });
+            }
+        }
+    });
+</script>
 {% endblock %}

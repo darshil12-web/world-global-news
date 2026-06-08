@@ -1,106 +1,397 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Play {{ game.title }} | TechWorld{% endblock %}
+{% block title %}Play {{ game.title }} | Pokgame{% endblock %}
+{% block meta_description %}Play {{ game.title }} for free online on Pokgame. No downloads, play instantly!{% endblock %}
 
 {% block content %}
-<div class="container main-layout" style="grid-template-columns: 1fr;">
-    <div class="content-area">
-        
-        <div class="play-container" style="background: var(--bg-secondary); border-radius: 12px; overflow: hidden; margin-top: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-            
-            <!-- TechWorld Logo & Title Header -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; background: #1a1a2e; color: #fff;">
-                <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700;">{{ game.title }}</h1>
-                <a href="{% url 'index' %}" class="logo" style="color: #fff; text-decoration: none;">
-                    TECH<span style="color: var(--accent-primary);">World</span>
-                </a>
-            </div>
-
-            <!-- Game Frame -->
-            <div class="iframe-container" style="width: 100%; height: 80vh; background: #000;">
-                <iframe src="{{ game.iframe_url }}" frameborder="0" allowfullscreen allow="autoplay; fullscreen *" style="width: 100%; height: 100%;"></iframe>
-            </div>
-
-            <div style="padding: 20px 25px;">
-                <p style="color: var(--text-secondary); margin: 0; font-size: 1.05rem;">{{ game.description|default:"Play "|add:game.title|add:" online for free on TechWorld!" }}</p>
-            </div>
-        </div>
-
-        <!-- Related Games -->
-        <section class="games-section" style="margin-top: 40px; padding-top: 40px; border-top: 1px dashed var(--border-color);">
-            <h2 class="section-title" style="margin-bottom: 24px;">More Games Like This</h2>
-            
-            <div class="games-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
-                {% for related in related_games %}
-                <a href="{% url 'play_game' related.id %}" class="game-card" title="{{ related.title }}">
-                    <img src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">
-                    <div class="game-overlay">
-                        <h3>{{ related.title }}</h3>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        </section>
-
+<!-- Roblox Launcher Dialog Modal (Simulated Loading) -->
+<div class="launcher-overlay" id="launcher-overlay">
+    <div class="launcher-dialog">
+        <div class="launcher-logo-tilt"></div>
+        <div class="launcher-spinner"></div>
+        <div class="launcher-text-bold">GamePro is loading...</div>
+        <div class="launcher-text-sub">Starting game server and downloading assets...</div>
     </div>
 </div>
 
-<style>
-    /* ── Game Grid (Reused for Related Games) ── */
-    .game-card {
-        position: relative;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        aspect-ratio: 1 / 1;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        display: block;
+<!-- Main Game Page Detail Layout -->
+<div class="game-detail-showcase">
+    <!-- Left Panel: Game Image or Frame -->
+    <div class="showcase-left" id="game-showcase-container" style="position: relative;">
+        <!-- Default: Thumbnail shown -->
+        <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" class="showcase-thumb" id="showcase-thumbnail-img">
+        
+        <!-- Loading Screen (Hidden initially) -->
+        <div id="game-loading-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 10; align-items: center; justify-content: center; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="logo-box" style="width: 32px; height: 32px; background-color: var(--text-color); border-radius: 6px; position: relative;">
+                    <span style="position: absolute; width: 16px; height: 16px; background-color: var(--bg-header); border-radius: 3px; top: 8px; left: 8px;"></span>
+                </span>
+                <span class="logo-text" style="font-weight: 800; font-size: 28px; letter-spacing: -0.5px; color: var(--text-color);">GAMEPRO</span>
+            </div>
+            <div style="color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="loader-2" class="spin-icon" style="width: 16px; height: 16px; animation: spin 1s linear infinite;"></i>
+                Loading game...
+            </div>
+        </div>
+
+        <!-- Hidden until Play button clicked -->
+        <iframe id="game-play-iframe" allowfullscreen="true" scrolling="no" src="" referrerpolicy="no-referrer" onload="hideLoadingOverlay()"></iframe>
+
+        <!-- Fullscreen Button Overlay -->
+        <button id="fullscreen-btn" onclick="toggleFullScreen()" title="Fullscreen" style="display: none; position: absolute; bottom: 16px; right: 16px; z-index: 20; background: rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 10px; cursor: pointer; color: white; transition: all 0.2s;">
+            <i data-lucide="maximize" id="fullscreen-icon"></i>
+        </button>
+    </div>
+
+    <!-- Right Panel: Play panel with Green Button -->
+    <div class="showcase-right">
+        <div class="detail-header-info">
+            <h1>{{ game.title }}</h1>
+            <p class="detail-dev-text">By <span>{{ game.creator }}</span></p>
+            
+            <div class="detail-quick-stats">
+                <div class="detail-quick-stat" title="Rating">
+                    <i data-lucide="thumbs-up" style="color: var(--color-green);"></i>
+                    <span style="color: var(--color-green);">{{ game.rating_pct }}%</span>
+                </div>
+                <div class="detail-quick-stat" title="Active Players">
+                    <i data-lucide="users"></i>
+                    <span>{{ game.active_players }} Playing</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="play-action-box">
+            <!-- Green Roblox Play Button -->
+            <button class="roblox-play-btn" id="roblox-start-game-btn" onclick="launchRobloxGame()">
+                <i data-lucide="play" fill="#FFF" style="width: 28px; height: 28px;"></i>
+                Play
+            </button>
+            <div class="play-price-label">
+                <span class="robux-icon" style="background-color: var(--text-muted); width: 12px; height: 12px; transform: scale(0.9);"></span>
+                Free to Play
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Section (About, Store, Servers) -->
+<div class="game-tabs-section">
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="switchGameTab(event, 'tab-about')">About</button>
+        <button class="tab-btn" onclick="switchGameTab(event, 'tab-store')">Store</button>
+        <button class="tab-btn" onclick="switchGameTab(event, 'tab-servers')">Servers</button>
+    </div>
+
+    <!-- About Tab -->
+    <div class="tab-pane active" id="tab-about">
+        <div class="about-tab-content">
+            <div class="game-description">
+                <h3>Description</h3>
+                <p style="white-space: pre-line;">{{ game.description|default:"No description provided for this game. Jump in and discover the ultimate playground adventure!" }}</p>
+                
+                <h3 style="margin-top: 24px;">Controls & Rules</h3>
+                <p style="color: var(--text-muted);">Use Keyboard/Mouse or Touch controls depending on the game type. Earn Robux points automatically for launching and playing this game on our platform.</p>
+            </div>
+            
+            <!-- Statistics Grid -->
+            <div class="game-stats-grid">
+                <div class="stat-row-item">
+                    <span class="stat-label-item">Active Players</span>
+                    <span class="stat-val-item">{{ game.active_players }}</span>
+                </div>
+                <div class="stat-row-item">
+                    <span class="stat-label-item">Visits</span>
+                    <span class="stat-val-item">{{ game.views }}</span>
+                </div>
+                <div class="stat-row-item">
+                    <span class="stat-label-item">Created</span>
+                    <span class="stat-val-item">{{ game.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="stat-row-item">
+                    <span class="stat-label-item">Updated</span>
+                    <span class="stat-val-item">{% if game.created_at %}{{ game.created_at|date:"M d, Y" }}{% else %}Recently{% endif %}</span>
+                </div>
+                <div class="stat-row-item">
+                    <span class="stat-label-item">Max Players</span>
+                    <span class="stat-val-item">50</span>
+                </div>
+                <div class="stat-row-item">
+                    <span class="stat-label-item">Genre</span>
+                    <span class="stat-val-item">{{ game.category }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Store Tab (Game passes) -->
+    <div class="tab-pane" id="tab-store">
+        <h3 style="margin-top: 0; margin-bottom: 20px;">Game Passes & Gear</h3>
+        <div class="store-items-container">
+            <!-- Pass 1: VIP -->
+            <div class="store-pass-card">
+                <div class="pass-icon-box">
+                    <i data-lucide="crown"></i>
+                </div>
+                <h4 class="pass-name">VIP Access Pass</h4>
+                <p class="pass-desc">Unlocks special tags, chat colors, and VIP areas.</p>
+                <button class="pass-buy-btn" id="buy-pass-vip" onclick="purchaseGamePass('vip', 45)">
+                    <span class="robux-icon"></span> 45 R$
+                </button>
+            </div>
+
+            <!-- Pass 2: Double XP -->
+            <div class="store-pass-card">
+                <div class="pass-icon-box">
+                    <i data-lucide="zap"></i>
+                </div>
+                <h4 class="pass-name">Double Speed Boost</h4>
+                <p class="pass-desc">Permanently run 2x faster inside the server lobbies.</p>
+                <button class="pass-buy-btn" id="buy-pass-speed" onclick="purchaseGamePass('speed', 90)">
+                    <span class="robux-icon"></span> 90 R$
+                </button>
+            </div>
+
+            <!-- Pass 3: Badge -->
+            <div class="store-pass-card">
+                <div class="pass-icon-box">
+                    <i data-lucide="award"></i>
+                </div>
+                <h4 class="pass-name">Super Fan Badge</h4>
+                <p class="pass-desc">Show off your support with a badge displayed on profile.</p>
+                <button class="pass-buy-btn" id="buy-pass-fan" onclick="purchaseGamePass('fan', 20)">
+                    <span class="robux-icon"></span> 20 R$
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Servers Tab -->
+    <div class="tab-pane" id="tab-servers">
+        <h3 style="margin-top: 0; margin-bottom: 20px;">Active Servers</h3>
+        <div class="servers-tab-content">
+            <div class="server-item-row">
+                <div class="server-info-left">
+                    <span class="server-title-text">Server #US-East-849</span>
+                    <span class="server-players-text">Players: 46 / 50</span>
+                    <div class="server-players-bar">
+                        <div class="server-players-fill" style="width: 92%;"></div>
+                    </div>
+                </div>
+                <button class="server-join-btn" onclick="launchRobloxGame()">Join</button>
+            </div>
+            
+            <div class="server-item-row">
+                <div class="server-info-left">
+                    <span class="server-title-text">Server #EU-West-302</span>
+                    <span class="server-players-text">Players: 28 / 50</span>
+                    <div class="server-players-bar">
+                        <div class="server-players-fill" style="width: 56%;"></div>
+                    </div>
+                </div>
+                <button class="server-join-btn" onclick="launchRobloxGame()">Join</button>
+            </div>
+
+            <div class="server-item-row">
+                <div class="server-info-left">
+                    <span class="server-title-text">Server #AS-South-192</span>
+                    <span class="server-players-text">Players: 12 / 50</span>
+                    <div class="server-players-bar">
+                        <div class="server-players-fill" style="width: 24%;"></div>
+                    </div>
+                </div>
+                <button class="server-join-btn" onclick="launchRobloxGame()">Join</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommended Games bottom carousel shelf -->
+<div class="games-shelf" style="margin-top: 48px;">
+    <div class="shelf-header">
+        <h3 class="shelf-title">More Games You Might Like</h3>
+    </div>
+    <div class="shelf-scroll-container">
+        <button class="scroll-arrow left" onclick="scrollShelf(this, -400)" aria-label="Scroll Left">
+            <i data-lucide="chevron-left"></i>
+        </button>
+        <div class="shelf-inner">
+            {% for rel_game in related_games %}
+            <div class="roblox-game-card">
+                <a href="{% url 'play_game' rel_game.slug %}" class="card-link" title="{{ rel_game.title }}">
+                    <div class="card-thumbnail-wrapper">
+                        <img src="{{ rel_game.thumbnail_url }}" alt="{{ rel_game.title }}" class="card-thumbnail" loading="lazy">
+                    </div>
+                    <div class="card-details">
+                        <h4 class="card-title">{{ rel_game.title }}</h4>
+                        <div class="card-creator">By {{ rel_game.creator }}</div>
+                        <div class="card-meta">
+                            <span class="meta-item" style="color: var(--color-green);">
+                                <i data-lucide="thumbs-up" class="meta-icon" style="width: 11px; height: 11px;"></i>
+                                <span class="card-rating-text">{{ rel_game.rating_pct }}%</span>
+                            </span>
+                            <span class="meta-item">
+                                <i data-lucide="users" class="meta-icon" style="width: 11px; height: 11px;"></i>
+                                <span>{{ rel_game.active_players }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="scroll-arrow right" onclick="scrollShelf(this, 400)" aria-label="Scroll Right">
+            <i data-lucide="chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Tab switching logic
+    window.switchGameTab = function(event, tabId) {
+        // Hide all panes
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        // Deactivate all buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        // Show current pane
+        document.getElementById(tabId).classList.add('active');
+        // Activate current button
+        event.currentTarget.classList.add('active');
+    };
+
+    // Shelf scrolling click trigger
+    window.scrollShelf = function(button, scrollVal) {
+        const container = button.parentNode.querySelector('.shelf-inner');
+        if (container) {
+            container.scrollBy({ left: scrollVal, behavior: 'smooth' });
+        }
+    };
+
+    // Hide loading overlay when iframe is fully loaded
+    window.hideLoadingOverlay = function() {
+        const overlay = document.getElementById('game-loading-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    };
+
+    // Roblox game launching animation
+    window.launchRobloxGame = function() {
+        const iframe = document.getElementById('game-play-iframe');
+        const thumb = document.getElementById('showcase-thumbnail-img');
+        const overlay = document.getElementById('game-loading-overlay');
+        const fsBtn = document.getElementById('fullscreen-btn');
+        
+        if (iframe && thumb) {
+            // Show loading screen immediately
+            if (overlay) overlay.style.display = 'flex';
+            if (fsBtn) fsBtn.style.display = 'block';
+            thumb.style.display = 'none';
+            iframe.style.display = 'block';
+
+            // Bypass GameDistribution Sitelocks & Wrappers
+            let finalUrl = "{{ game.iframe_url|escapejs }}";
+            if (finalUrl.includes('html5.gamedistribution.com') && !finalUrl.includes('rvvASMiM')) {
+                // Match the 32-character ID even if trailing slash is missing or query params exist
+                const match = finalUrl.match(/html5\.gamedistribution\.com\/([a-zA-Z0-9]{32})/);
+                if (match && match[1]) {
+                    finalUrl = `https://html5.gamedistribution.com/rvvASMiM/${match[1]}/index.html`;
+                    console.log("Sitelock bypassed! Rewrote to raw game:", finalUrl);
+                }
+            }
+
+            // Set source if not already set
+            if (!iframe.src || iframe.src === window.location.href) {
+                iframe.src = finalUrl;
+            }
+        }
+    };
+
+    // Fullscreen Toggle Logic
+    window.toggleFullScreen = function() {
+        const container = document.getElementById('game-showcase-container');
+        
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            // Enter fullscreen
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            } else if (container.webkitRequestFullscreen) { /* Safari */
+                container.webkitRequestFullscreen();
+            } else if (container.msRequestFullscreen) { /* IE11 */
+                container.msRequestFullscreen();
+            }
+        } else {
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+    };
+
+    // Listen for fullscreen changes to update icon if needed
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+    
+    function updateFullscreenIcon() {
+        const icon = document.getElementById('fullscreen-icon');
+        if (!icon) return;
+        
+        // This is a simple visual update; real lucide icon swapping requires lucide.createIcons() 
+        // But since we are embedded, we can just let it be or change color
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            icon.style.color = "var(--color-green)";
+        } else {
+            icon.style.color = "white";
+        }
     }
 
-    .game-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.3s ease;
+    // Purchase Game Pass helper
+    window.purchaseGamePass = function(passId, price) {
+        // Unique gamepass key for this game
+        const storageKey = `gamepass_${passId}_{{ game.id }}`;
+        
+        if (localStorage.getItem(storageKey) === 'true') {
+            return; // Already owned
+        }
+        
+        if (robloxRobux < price) {
+            updateRobux(0, "Insufficient Robux!", "You need more Robux to purchase this gamepass!");
+            return;
+        }
+        
+        // Deduct Robux
+        updateRobux(-price, "Purchase Successful!", `VIP Pass for {{ game.title }} purchased!`);
+        localStorage.setItem(storageKey, 'true');
+        
+        // Update button status
+        syncPassStatus();
+    };
+
+    // Sync pass buttons
+    function syncPassStatus() {
+        const passes = ['vip', 'speed', 'fan'];
+        passes.forEach(passId => {
+            const btn = document.getElementById(`buy-pass-${passId}`);
+            if (btn) {
+                const storageKey = `gamepass_${passId}_{{ game.id }}`;
+                if (localStorage.getItem(storageKey) === 'true') {
+                    btn.innerText = 'Owned';
+                    btn.classList.add('owned');
+                    btn.onclick = null;
+                }
+            }
+        });
     }
 
-    .game-card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
-        z-index: 5;
-    }
-
-    .game-card:hover img {
-        transform: scale(1.05);
-    }
-
-    .game-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
-        padding: 30px 10px 10px;
-        opacity: 0;
-        transition: opacity 0.22s ease;
-    }
-
-    .game-overlay h3 {
-        color: #fff;
-        margin: 0;
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .game-card:hover .game-overlay {
-        opacity: 1;
-    }
-</style>
+    document.addEventListener('DOMContentLoaded', () => {
+        syncPassStatus();
+    });
+</script>
 {% endblock %}

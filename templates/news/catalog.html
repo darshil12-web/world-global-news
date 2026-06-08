@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Catalog Shop | GamePro Portal{% endblock %}
+
+{% block content %}
+<div class="catalog-container">
+    <div class="category-header">
+        <h2 class="category-title-main">Avatar Shop</h2>
+        <div class="grid-filter-bar">
+            <!-- Filter buttons -->
+            <button class="tab-btn active" id="cat-filter-all" onclick="filterCatalog('all')" style="padding: 8px 16px; font-size: 14px;">All</button>
+            <button class="tab-btn" id="cat-filter-hat" onclick="filterCatalog('hat')" style="padding: 8px 16px; font-size: 14px;">Hats</button>
+            <button class="tab-btn" id="cat-filter-shirt" onclick="filterCatalog('shirt')" style="padding: 8px 16px; font-size: 14px;">Shirts</button>
+            <button class="tab-btn" id="cat-filter-face" onclick="filterCatalog('face')" style="padding: 8px 16px; font-size: 14px;">Faces</button>
+        </div>
+    </div>
+
+    <!-- Catalog Listing Grid -->
+    <div class="catalog-grid">
+        {% for item in items %}
+        <div class="catalog-item-card" data-category="{{ item.type }}" id="card-{{ item.id }}">
+            <div class="catalog-img-box">
+                <div style="position: relative; width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;" id="catalog-preset-{{ item.id }}">
+                    <!-- Preset SVG gets loaded by JS -->
+                </div>
+            </div>
+            <div style="padding: 4px;">
+                <h4 class="catalog-title" title="{{ item.name }}">{{ item.name }}</h4>
+                <div class="catalog-type">{{ item.type }}</div>
+                
+                <div class="catalog-price-row">
+                    <div class="catalog-price">
+                        {% if item.price == 0 %}
+                            <span style="color: var(--color-green);">Free</span>
+                        {% else %}
+                            <span class="robux-icon" style="transform: scale(0.95);"></span>
+                            <span style="color: var(--color-green);">{{ item.price }} R$</span>
+                        {% endif %}
+                    </div>
+                    <button class="catalog-buy-btn" id="buy-btn-{{ item.id }}" onclick="buyCatalogItem('{{ item.id }}', {{ item.price }}, '{{ item.name }}')">
+                        Buy
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Load presets
+    document.addEventListener('DOMContentLoaded', () => {
+        const items = [
+            {% for item in items %}
+            { id: '{{ item.id }}', type: '{{ item.type }}' },
+            {% endfor %}
+        ];
+        
+        items.forEach(item => {
+            const container = document.getElementById(`catalog-preset-${item.id}`);
+            if (container) {
+                if (item.type === 'hat' && avatarPresets.hats[item.id]) {
+                    container.innerHTML = avatarPresets.hats[item.id];
+                } else if (item.type === 'shirt' && avatarPresets.shirts[item.id]) {
+                    container.innerHTML = avatarPresets.shirts[item.id];
+                } else if (item.type === 'face' && avatarPresets.faces[item.id]) {
+                    container.innerHTML = avatarPresets.faces[item.id];
+                }
+            }
+        });
+        
+        syncCatalogButtons();
+    });
+
+    // Catalog filtering
+    window.filterCatalog = function(category) {
+        // Toggle tab active class
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`cat-filter-${category}`).classList.add('active');
+        
+        // Filter cards
+        document.querySelectorAll('.catalog-item-card').forEach(card => {
+            const cardCat = card.getAttribute('data-category');
+            if (category === 'all' || cardCat === category) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
+
+    // Purchase handler
+    window.buyCatalogItem = function(itemId, price, name) {
+        if (robloxInventory.includes(itemId)) {
+            return; // Already owned
+        }
+        
+        if (robloxRobux < price) {
+            updateRobux(0, "Insufficient Robux!", "Earn more Robux by playing games or claiming free daily tasks!");
+            return;
+        }
+        
+        // Update Robux and add to inventory list
+        updateRobux(-price, "Item Purchased!", `Bought ${name} successfully! Check your Avatar Editor.`);
+        robloxInventory.push(itemId);
+        localStorage.setItem('roblox_inventory', JSON.stringify(robloxInventory));
+        
+        // Refresh buttons
+        syncCatalogButtons();
+    };
+
+    // Sync button labels
+    function syncCatalogButtons() {
+        {% for item in items %}
+        if (robloxInventory.includes('{{ item.id }}')) {
+            const btn = document.getElementById('buy-btn-{{ item.id }}');
+            if (btn) {
+                btn.innerText = 'Owned';
+                btn.classList.add('owned');
+                btn.style.backgroundColor = 'var(--bg-hover)';
+                btn.style.color = 'var(--text-muted)';
+                btn.style.cursor = 'default';
+                btn.onclick = null;
+            }
+        }
+        {% endfor %}
+    }
+</script>
+{% endblock %}

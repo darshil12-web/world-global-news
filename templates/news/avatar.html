@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avatar Editor | GamePro Portal{% endblock %}
+
+{% block content %}
+<div class="avatar-editor-title">Avatar Customizer</div>
+
+<div class="avatar-editor-layout">
+    <!-- Left Panel: Preview -->
+    <div class="avatar-preview-box">
+        <h3 style="margin-top: 0; margin-bottom: 16px;">Avatar Preview</h3>
+        <div class="avatar-preview-container" style="width: 220px; height: 260px;">
+            <div id="editor-avatar-composite" style="width: 100%; height: 100%;">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+        <div style="margin-top: 16px; text-align: center;">
+            <span style="font-size: 13px; color: var(--text-muted);">Currently Wearing:</span>
+            <div style="font-size: 14px; font-weight: 700; margin-top: 4px; display: flex; flex-direction: column; gap: 4px;" id="wearing-labels">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Selector Grid -->
+    <div class="avatar-selector-box">
+        <div class="avatar-tabs">
+            <button class="avatar-tab active" id="btn-tab-hat" onclick="switchAvatarCategory('hat')">Hats</button>
+            <button class="avatar-tab" id="btn-tab-shirt" onclick="switchAvatarCategory('shirt')">Shirts</button>
+            <button class="avatar-tab" id="btn-tab-face" onclick="switchAvatarCategory('face')">Faces</button>
+        </div>
+        
+        <div class="avatar-grid" id="editor-items-grid">
+            <!-- Loaded dynamically based on LocalStorage inventory -->
+        </div>
+        
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 13px; color: var(--text-muted);">Want more outfits? Visit the Catalog Shop!</div>
+            <a href="{% url 'catalog' %}" class="pass-buy-btn" style="color: var(--color-blue); border-color: var(--color-blue); text-decoration: none;">
+                <i data-lucide="shopping-bag" style="width: 14px; height: 14px;"></i> Shop Catalog
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const catalogDetails = {
+        bacon_hair: { name: 'Bacon Hair', type: 'hat' },
+        red_cap: { name: 'Roblox Red Cap', type: 'hat' },
+        wizard_hat: { name: 'Wizard Hat', type: 'hat' },
+        crown: { name: 'Royal Crown', type: 'hat' },
+        valkyrie: { name: 'Valkyrie Helm', type: 'hat' },
+        roblox_hoodie: { name: 'Blue Hoodie', type: 'shirt' },
+        tuxedo: { name: 'Elegant Tuxedo', type: 'shirt' },
+        gold_tee: { name: 'Gold Chain Tee', type: 'shirt' },
+        ninja_suit: { name: 'Ninja Gi', type: 'shirt' },
+        smile_face: { name: 'Default Smile', type: 'face' },
+        chill_face: { name: 'Chill Face', type: 'face' },
+        winner_face: { name: 'Winner Smile', type: 'face' },
+        beast_face: { name: 'Beast Mode', type: 'face' },
+    };
+
+    let activeCategory = 'hat';
+
+    window.switchAvatarCategory = function(category) {
+        activeCategory = category;
+        
+        // Toggle active tab class
+        document.querySelectorAll('.avatar-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-tab-${category}`).classList.add('active');
+        
+        renderItemsGrid();
+    };
+
+    window.equipItem = function(itemId, category) {
+        if (category === 'hat') {
+            robloxEquippedHat = itemId;
+            localStorage.setItem('roblox_equipped_hat', itemId);
+        } else if (category === 'shirt') {
+            robloxEquippedShirt = itemId;
+            localStorage.setItem('roblox_equipped_shirt', itemId);
+        } else if (category === 'face') {
+            robloxEquippedFace = itemId;
+            localStorage.setItem('roblox_equipped_face', itemId);
+        }
+        
+        // Re-render UI
+        updateGlobalUI();
+        updateEditorUI();
+        renderItemsGrid();
+        
+        // Show success toast
+        const item = catalogDetails[itemId] || { name: 'Item' };
+        updateRobux(0, "Outfit Equipped!", `You are now wearing ${item.name}!`);
+    };
+
+    function updateEditorUI() {
+        // Render large preview
+        const container = document.getElementById('editor-avatar-composite');
+        if (container) {
+            container.innerHTML = getAvatarSVG(robloxEquippedHat, robloxEquippedShirt, robloxEquippedFace, 1.0);
+        }
+        
+        // Update labels
+        const wearingLabels = document.getElementById('wearing-labels');
+        if (wearingLabels) {
+            const hatName = catalogDetails[robloxEquippedHat]?.name || 'None';
+            const shirtName = catalogDetails[robloxEquippedShirt]?.name || 'None';
+            const faceName = catalogDetails[robloxEquippedFace]?.name || 'None';
+            
+            wearingLabels.innerHTML = `
+                <span style="color: var(--color-blue);">🎩 Hat: ${hatName}</span>
+                <span style="color: var(--color-green);">👕 Shirt: ${shirtName}</span>
+                <span style="color: #FFD066;">😊 Face: ${faceName}</span>
+            `;
+        }
+    }
+
+    function renderItemsGrid() {
+        const grid = document.getElementById('editor-items-grid');
+        if (!grid) return;
+        
+        // Filter owned inventory items of current category
+        const ownedItems = robloxInventory.filter(itemId => {
+            const item = catalogDetails[itemId];
+            return item && item.type === activeCategory;
+        });
+        
+        if (ownedItems.length === 0) {
+            grid.innerHTML = `<div style="grid-column: span 12; text-align: center; color: var(--text-sub); padding: 24px;">No owned items in this category. Buy outfits in the catalog!</div>`;
+            return;
+        }
+        
+        let html = '';
+        ownedItems.forEach(itemId => {
+            const item = catalogDetails[itemId];
+            let itemContent = '';
+            
+            // Generate the SVG render
+            if (activeCategory === 'hat' && avatarPresets.hats[itemId]) {
+                itemContent = avatarPresets.hats[itemId];
+            } else if (activeCategory === 'shirt' && avatarPresets.shirts[itemId]) {
+                itemContent = avatarPresets.shirts[itemId];
+            } else if (activeCategory === 'face' && avatarPresets.faces[itemId]) {
+                itemContent = avatarPresets.faces[itemId];
+            }
+            
+            const isEquipped = (robloxEquippedHat === itemId || robloxEquippedShirt === itemId || robloxEquippedFace === itemId);
+            
+            html += `
+                <div class="avatar-item-card ${isEquipped ? 'equipped' : ''}" onclick="equipItem('${itemId}', '${activeCategory}')">
+                    <div class="avatar-item-img">
+                        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            ${itemContent}
+                        </div>
+                    </div>
+                    <div class="avatar-item-name">${item.name}</div>
+                    ${isEquipped ? '<span class="avatar-item-equipped-badge">Equipped</span>' : ''}
+                </div>`;
+        });
+        grid.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateEditorUI();
+        renderItemsGrid();
+    });
+</script>
+{% endblock %}

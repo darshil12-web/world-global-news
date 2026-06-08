@@ -3,10 +3,17 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('games/', views.games, name='games'),
-    path('play/<int:game_id>/', views.play_game, name='play_game'),
-    path('category/<str:category>/', views.category_news, name='category_news'),
-    path('article/<slug:slug>/', views.news_detail, name='news_detail'),
+    path('search-suggestions/', views.search_suggestions, name='search_suggestions'),
+    path('category/<str:category>/', views.category_games, name='category_games'),
+    path('play/<slug:slug>/', views.play_game, name='play_game'),
+    
+    # Custom Roblox Replica Pages
+    path('profile/', views.profile, name='profile'),
+    path('avatar/', views.avatar, name='avatar'),
+    path('catalog/', views.catalog, name='catalog'),
+    path('robux/', views.robux_page, name='robux_page'),
+    
+    # Legal / Static pages
     path('about-us/', views.about, name='about'),
     path('contact-us/', views.contact, name='contact'),
     path('disclaimer/', views.disclaimer, name='disclaimer'),
@@ -15,7 +22,5 @@ urlpatterns = [
     path('cookie-policy/', views.cookie, name='cookie'),
     path('dmca/', views.dmca, name='dmca'),
     path('editorial-policy/', views.editorial_policy, name='editorial_policy'),
-    
-    path('api/comments/<slug:slug>/', views.api_get_comments, name='api_get_comments'),
-    path('api/comments/<slug:slug>/post/', views.api_post_comment, name='api_post_comment'),
+    path('set-username/', views.set_username, name='set_username'),
 ]

@@ -1,41 +1,43 @@
 {% extends 'base.html' %}
-{% block title %}Terms of Service | TechWorld{% endblock %}
+{% block title %}Terms of Service | GameWorld{% endblock %}
 {% block content %}
-<div class="legal-page-header">
-    <div class="container">
-        <h1 class="legal-page-title">Terms of Service</h1>
-        <p class="legal-page-subtitle">The rules and guidelines for using our website.</p>
+<div class="info-page-container">
+    <a href="{% url 'index' %}" class="back-btn">⬅ Back to Games</a>
+
+    <div class="info-page-header">
+        <h1>Terms of Service</h1>
     </div>
-</div>
 
-<div class="container">
-    <div class="legal-container">
-        <div class="legal-content">
-            <h2>1. Terms</h2>
-            <p>By accessing the website at TechWorld, you are agreeing to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws. If you do not agree with any of these terms, you are prohibited from using or accessing this site. The materials contained in this website are protected by applicable copyright and trademark law.</p>
-            
-            <h2>2. Use License</h2>
-            <p>Permission is granted to temporarily download one copy of the materials (information or software) on TechWorld's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
-            <ul>
-                <li>modify or copy the materials;</li>
-                <li>use the materials for any commercial purpose, or for any public display (commercial or non-commercial);</li>
-                <li>attempt to decompile or reverse engineer any software contained on TechWorld's website;</li>
-                <li>remove any copyright or other proprietary notations from the materials; or</li>
-                <li>transfer the materials to another person or "mirror" the materials on any other server.</li>
-            </ul>
+    <div class="info-content">
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing and using GameWorld (the "Website"), you agree to be bound by these Terms of Service. If you do
+            not agree with any part of these terms, please do not use our platform.</p>
 
-            <h2>3. Disclaimer</h2>
-            <p>The materials on TechWorld's website are provided on an 'as is' basis. TechWorld makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+        <h2>2. Use of the Platform</h2>
+        <p>GameWorld provides a free online gaming platform. You agree to use the website only for lawful purposes. You
+            may not:</p>
+        <ul>
+            <li>Use automated scripts, bots, or scrapers to access or download content.</li>
+            <li>Attempt to bypass or disable any security features of the website.</li>
+            <li>Embed our games on other websites without explicit permission.</li>
+        </ul>
 
-            <h2>4. Limitations</h2>
-            <p>In no event shall TechWorld or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on TechWorld's website, even if TechWorld or a TechWorld authorized representative has been notified orally or in writing of the possibility of such damage.</p>
+        <h2>3. Intellectual Property</h2>
+        <p>All games hosted on GameWorld are the property of their respective developers and publishers. Our platform
+            acts as a portal. We do not claim ownership of the third-party games we host unless explicitly stated.</p>
 
-            <h2>5. Links</h2>
-            <p>TechWorld has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by TechWorld of the site. Use of any such linked website is at the user's own risk.</p>
+        <h2>4. User Generated Content</h2>
+        <p>If you submit feedback, reviews, or other content to GameWorld, you grant us a non-exclusive, royalty-free
+            license to use, reproduce, and display that content on our platform.</p>
 
-            <h2>6. Modifications</h2>
-            <p>TechWorld may revise these terms of service for its website at any time without notice. By using this website you are agreeing to be bound by the then current version of these terms of service.</p>
-        </div>
+        <h2>5. Limitation of Liability</h2>
+        <p>GameWorld is provided "as is" without any warranties. We do not guarantee that the website will be
+            uninterrupted, error-free, or completely secure. We are not liable for any data loss, including saved game
+            progress, that may occur.</p>
+
+        <h2>6. Contact</h2>
+        <p>If you have any questions regarding these Terms of Service, please <a href="{% url 'contact' %}">contact
+                us</a>.</p>
     </div>
 </div>
 {% endblock %}

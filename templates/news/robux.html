@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Get Robux | GamePro Portal{% endblock %}
+
+{% block content %}
+<div class="create-container" style="max-width: 700px;">
+    <h2 class="create-title" style="color: var(--color-green); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span class="robux-icon" style="width: 28px; height: 28px; background-color: var(--color-green);"></span>
+        Robux Claim Center
+    </h2>
+    <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 32px;">
+        Need Robux to purchase custom faces, hats, badges, or VIP passes in the Avatar shop? Earn them here for free!
+    </p>
+
+    <!-- Balance Status card -->
+    <div style="background-color: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+        <div>
+            <span style="font-size: 13px; color: var(--text-muted);">Your Account Balance:</span>
+            <div style="font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                <span class="robux-icon" style="width: 20px; height: 20px;"></span>
+                <span id="robux-claim-amount">100</span> <span style="font-size: 16px; color: var(--text-muted); font-weight: 500;">R$</span>
+            </div>
+        </div>
+        <a href="{% url 'catalog' %}" class="create-submit-btn" style="padding: 10px 20px; font-size: 14px; text-decoration: none; background-color: var(--color-green);">
+            <i data-lucide="shopping-bag" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+            Spend in Shop
+        </a>
+    </div>
+
+    <!-- Two columns of claims: Daily Reward vs Coin Clicker -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- Column 1: Daily login reward -->
+        <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <i data-lucide="calendar-check" style="width: 44px; height: 44px; color: var(--color-blue); margin-bottom: 12px;"></i>
+                <h3 style="margin: 0 0 8px 0;">Daily Login Reward</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 16px 0; line-height: 1.5;">
+                    Claim free Robux every 24 hours. Log in daily to accumulate enough funds for legendary accessories.
+                </p>
+            </div>
+            
+            <button class="roblox-play-btn" id="daily-claim-btn" onclick="claimDailyRobux()" style="padding: 12px; font-size: 15px; border-radius: 8px; background-color: var(--color-blue); box-shadow: 0 4px 8px rgba(0, 162, 255, 0.25);">
+                Claim +50 R$
+            </button>
+        </div>
+
+        <!-- Column 2: Coin Clicker Miner -->
+        <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <i data-lucide="hammer" style="width: 44px; height: 44px; color: var(--color-green); margin-bottom: 12px;"></i>
+                <h3 style="margin: 0 0 8px 0;">Robux Clicker Miner</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 16px 0; line-height: 1.5;">
+                    Click the gold coin 50 times to mine the blocks and extract a reward of +15 R$. Infinite clicks!
+                </p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <!-- Clicker Button -->
+                <button class="robux-display" id="clicker-gold-coin" onclick="clickGoldCoin()" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--color-green); background-color: var(--bg-sidebar); cursor: pointer; transition: transform 0.1s;">
+                    <span class="robux-icon" style="width: 24px; height: 24px;"></span>
+                </button>
+                
+                <!-- Progress bar -->
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">
+                        <span>Mining Progress</span>
+                        <span id="clicker-progress-text">0 / 50 clicks</span>
+                    </div>
+                    <div class="server-players-bar" style="width: 100%; height: 8px; border-radius: 4px;">
+                        <div class="server-players-fill" id="clicker-progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Clicker counter
+    let goldCoinClicks = 0;
+
+    window.clickGoldCoin = function() {
+        goldCoinClicks++;
+        
+        // Button bounce effect on click
+        const btn = document.getElementById('clicker-gold-coin');
+        if (btn) {
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 100);
+        }
+        
+        if (goldCoinClicks >= 50) {
+            goldCoinClicks = 0;
+            // Award +15 Robux
+            updateRobux(15, "Gold Mined!", "+15 Robux earned from Clicker!");
+            
+            // Sync page display
+            document.getElementById('robux-claim-amount').innerText = robloxRobux;
+        }
+        
+        // Update progress bar
+        const pct = (goldCoinClicks / 50) * 100;
+        document.getElementById('clicker-progress-fill').style.width = `${pct}%`;
+        document.getElementById('clicker-progress-text').innerText = `${goldCoinClicks} / 50 clicks`;
+    };
+
+    // Daily Claim handler
+    window.claimDailyRobux = function() {
+        const lastClaim = localStorage.getItem('roblox_last_claim_date');
+        const today = new Date().toDateString();
+        
+        if (lastClaim === today) {
+            updateRobux(0, "Already Claimed!", "You've already claimed your daily reward. Come back tomorrow!");
+            return;
+        }
+        
+        // Award R$50 and save today's date
+        updateRobux(50, "Daily Reward!", "+50 Robux added to your balance!");
+        localStorage.setItem('roblox_last_claim_date', today);
+        
+        // Sync page display and disable button
+        document.getElementById('robux-claim-amount').innerText = robloxRobux;
+        syncDailyClaimBtn();
+    };
+
+    function syncDailyClaimBtn() {
+        const lastClaim = localStorage.getItem('roblox_last_claim_date');
+        const today = new Date().toDateString();
+        const btn = document.getElementById('daily-claim-btn');
+        
+        if (btn) {
+            if (lastClaim === today) {
+                btn.innerText = 'Claimed Today';
+                btn.style.backgroundColor = 'var(--bg-hover)';
+                btn.style.boxShadow = 'none';
+                btn.style.color = 'var(--text-muted)';
+                btn.style.cursor = 'default';
+            } else {
+                btn.innerText = 'Claim +50 R$';
+                btn.style.backgroundColor = 'var(--color-blue)';
+                btn.style.boxShadow = '0 4px 8px rgba(0, 162, 255, 0.25)';
+                btn.style.color = '#FFFFFF';
+                btn.style.cursor = 'pointer';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Update balance indicator
+        document.getElementById('robux-claim-amount').innerText = robloxRobux;
+        
+        syncDailyClaimBtn();
+    });
+</script>
+{% endblock %}

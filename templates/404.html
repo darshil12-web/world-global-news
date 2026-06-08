@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}404 - Game Over | GameWorld{% endblock %}
+{% block meta_description %}Oops! This page does not exist. Back to playing free games!{% endblock %}
+
+{% block content %}
+<style>
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 80px 20px;
+        min-height: 60vh;
+    }
+
+    .error-code {
+        font-size: 8rem;
+        font-weight: 900;
+        color: #fff;
+        margin: 0;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        letter-spacing: -2px;
+        line-height: 1;
+    }
+
+    .error-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 10px 0 20px;
+    }
+
+    .error-msg {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 40px;
+        max-width: 500px;
+    }
+
+    .play-btn {
+        background: #fff;
+        color: var(--poki-blue);
+        border: none;
+        padding: 16px 48px;
+        border-radius: 100px;
+        font-size: 1.2rem;
+        font-weight: 900;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .play-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+</style>
+
+<div class="error-container">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Game Over!</h2>
+    <p class="error-msg">Oops, looks like you've wandered out of bounds. The page or game you are looking for doesn't
+        exist.</p>
+    <a href="{% url 'index' %}" class="play-btn">Play Free Games</a>
+</div>
+{% endblock %}

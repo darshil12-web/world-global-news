@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-y1r4-&0hr8$2)d23s9au0kqgu#8m*6=(g28m&!7mmj%98sv6_4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 
 # Application definition
@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'news.context_processors.sidebar_games_processor',
             ],
         },
     },

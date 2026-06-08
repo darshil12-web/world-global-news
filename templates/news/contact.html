@@ -1,34 +1,72 @@
 {% extends 'base.html' %}
-{% block title %}Contact Us | TechWorld{% endblock %}
+{% block title %}Contact Us | GameWorld{% endblock %}
 {% block content %}
-<div class="legal-page-header">
-    <div class="container">
-        <h1 class="legal-page-title">Contact Us</h1>
-        <p class="legal-page-subtitle">We would love to hear from you. Get in touch with our team.</p>
+<style>
+    .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 2px solid #f1f4f8;
+        font-family: var(--font-family);
+        font-size: 1rem;
+        font-weight: 600;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+        border-color: var(--poki-light);
+    }
+
+    .submit-btn {
+        background: var(--poki-blue);
+        color: #fff;
+        border: none;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .submit-btn:hover {
+        background: #1288ba;
+    }
+</style>
+
+<div class="info-page-container">
+    <a href="{% url 'index' %}" class="back-btn">⬅ Back to Games</a>
+
+    <div class="info-page-header">
+        <h1>Contact Us</h1>
     </div>
-</div>
 
-<div class="container">
-    <div class="legal-container">
-        <div class="legal-content">
-            <p>We value our readers and are always here to help. If you have any questions, feedback, inquiries, or if you want to report an issue with our website, please feel free to reach out to us using the information below.</p>
-            
-            <div class="legal-contact-box">
-                <h3>Contact Information</h3>
-                <p><strong>Email For General Inquiries:</strong> contact@techworld.com</p>
-                <p><strong>Email For Editorial Team:</strong> editor@techworld.com</p>
-                <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-                <p><strong>Mailing Address:</strong><br>
-                123 TechWorld Ave, Suite 400<br>
-                News City, NY 10001<br>
-                United States</p>
-            </div>
+    <div class="info-content">
+        <h2>We'd love to hear from you!</h2>
+        <p>Whether you've found a bug in a game, want to suggest a new title, or have a business inquiry, our team is
+            ready to help.</p>
 
-            <h2>Advertising & Partnerships</h2>
-            <p>For advertising inquiries or business partnerships, please email us at <strong>ads@techworld.com</strong>. We offer various customized advertising solutions that adhere to Google AdSense guidelines.</p>
+        <h2>Get in Touch</h2>
+        <p>Please fill out the form below or send an email directly to <strong>support@gameworld.com</strong>.</p>
 
-            <p><em>Our support team is available Monday to Friday, from 9:00 AM to 5:00 PM EST. We typically respond to all inquiries within 24-48 business hours.</em></p>
-        </div>
+        <form class="contact-form" action="{% url 'contact' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email Address" required>
+            <input type="text" name="subject" placeholder="Subject (e.g., Bug Report, Game Request)">
+            <textarea name="message" rows="6" placeholder="How can we help you?" required></textarea>
+            <button type="submit" class="submit-btn">Send Message</button>
+        </form>
     </div>
 </div>
 {% endblock %}
